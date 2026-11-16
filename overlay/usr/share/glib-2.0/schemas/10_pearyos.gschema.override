@@ -1,0 +1,11 @@
+[net.launchpad.plank.dock.settings]
+theme='PearyGlass'
+icon-size=52
+zoom-enabled=true
+zoom-percent=140
+hide-mode='none'
+auto-pinning=false
+position='bottom'
+alignment='center'
+items-alignment='center'
+dock-items=['thunar.dockitem','org.gnome.Epiphany.dockitem','xfce4-terminal.dockitem','org.xfce.mousepad.dockitem','xfce-settings-manager.dockitem','gparted.dockitem']

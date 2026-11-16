@@ -1,0 +1,59 @@
+#!/bin/bash
+# Starts the PearyOS glass compositor (picom) in the best mode this machine can handle:
+#   full - OpenGL on a real GPU: frosted background blur, soft shadows, rounded windows
+#   soft - OpenGL on a software renderer (VM without 3D): same look, lighter blur, less CPU
+#   lite - no OpenGL at all: translucency, soft shadows, rounded windows (no blur)
+#   off  - no compositor (plain, opaque desktop)
+# Force a mode:  echo full > ~/.config/pearyos/glass-mode      (auto | full | soft | lite | off)
+#           or boot with  pearyos.glass=full|soft|lite|off
+# The mode in use is written to $XDG_RUNTIME_DIR/pearyos-glass-mode.
+CONF_DIR=/usr/share/pearyos
+RT=${XDG_RUNTIME_DIR:-/tmp}
+STATE=$RT/pearyos-glass-mode
+LOG=$RT/pearyos-glass.log
+USER_CFG=${XDG_CONFIG_HOME:-$HOME/.config}/pearyos/glass-mode
+
+want=auto
+[ -r "$USER_CFG" ] && want=$(tr -d ' \r\n' < "$USER_CFG")
+if [ -z "$want" ] || [ "$want" = auto ]; then
+  cmd=$(tr ' ' '\n' < /proc/cmdline 2>/dev/null | sed -n 's/^pearyos\.glass=//p' | tail -n1)
+  want=${cmd:-auto}
+fi
+case "$want" in full|soft|lite|off|auto) ;; *) want=auto ;; esac
+
+detect() {
+  # QEMU without hardware acceleration (TCG) is far too slow for any blur.
+  if [ "$(systemd-detect-virt 2>/dev/null)" = qemu ]; then echo lite; return; fi
+  if command -v glxinfo >/dev/null 2>&1; then
+    local info
+    info=$(timeout 10 glxinfo 2>/dev/null)
+    if echo "$info" | grep -q 'direct rendering: Yes' && echo "$info" | grep -q 'GLX_EXT_texture_from_pixmap'; then
+      if echo "$info" | grep -qiE 'renderer string:.*(llvmpipe|softpipe|swrast)'; then
+        if [ "$(nproc 2>/dev/null || echo 1)" -ge 2 ]; then echo soft; else echo lite; fi
+        return
+      fi
+      echo full; return
+    fi
+  fi
+  echo lite
+}
+
+mode=$want
+[ "$mode" = auto ] && mode=$(detect)
+echo "$mode" > "$STATE"
+echo "$(date '+%F %T') pearyos-glass: mode=$mode (requested: $want)" >> "$LOG"
+[ "$mode" = off ] && exit 0
+
+while :; do
+  started=$(date +%s)
+  picom --config "$CONF_DIR/picom-$mode.conf" >> "$LOG" 2>&1
+  rc=$?
+  [ "$rc" -eq 0 ] && exit 0              # a clean exit means the session is ending or the user stopped it
+  if [ $(( $(date +%s) - started )) -lt 20 ]; then   # it keeps dying: step down a level
+    case "$mode" in full|soft) mode=lite ;; *) mode=off ;; esac
+    echo "$mode" > "$STATE"
+    echo "$(date '+%F %T') pearyos-glass: picom failed (rc=$rc), falling back to $mode" >> "$LOG"
+    [ "$mode" = off ] && exit 1
+  fi
+  sleep 1
+done

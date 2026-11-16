@@ -1,0 +1,11 @@
+[Unit]
+Description=PearyOS boot self-test (runs only when a VM host requests it)
+ConditionCredential=pearyos.selftest
+After=NetworkManager.service lightdm.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/pearyos-selftest
+
+[Install]
+WantedBy=multi-user.target

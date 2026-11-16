@@ -1,0 +1,16 @@
+#!/bin/bash
+# Point every monitor and workspace at the PearyOS wallpaper (monitor names differ from machine to machine).
+IMG=${1:-/usr/share/backgrounds/pearyos/pearyos-default.jpg}
+[ -r "$IMG" ] || exit 0
+command -v xfconf-query >/dev/null 2>&1 || exit 0
+set_wp() {
+  for ws in 0 1 2 3; do
+    base=/backdrop/screen0/$1/workspace$ws
+    xfconf-query -c xfce4-desktop -p "$base/last-image"  -n -t string -s "$IMG"
+    xfconf-query -c xfce4-desktop -p "$base/image-style" -n -t int    -s 5
+    xfconf-query -c xfce4-desktop -p "$base/color-style" -n -t int    -s 0
+  done
+}
+# xfdesktop names monitors "monitor<output>" (monitorHDMI-1, monitoreDP-1, ...) or "monitor0" when it cannot tell.
+for name in $(xrandr --listmonitors 2>/dev/null | awk 'NR>1 {print $NF}'); do set_wp "monitor$name"; done
+set_wp monitor0

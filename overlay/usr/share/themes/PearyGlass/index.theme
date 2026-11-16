@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=X-GNOME-Metatheme
+Name=PearyGlass
+Comment=PearyOS glass theme: Arc-Dark base with translucent shell surfaces
+Encoding=UTF-8
+
+[X-GNOME-Metatheme]
+GtkTheme=PearyGlass
+MetacityTheme=Arc-Dark
+IconTheme=Papirus-Dark
+CursorTheme=Adwaita
+ButtonLayout=menu:minimize,maximize,close

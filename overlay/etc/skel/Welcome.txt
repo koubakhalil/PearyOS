@@ -1,0 +1,17 @@
+Welcome to PearyOS (live session)
+
+ * You are logged in as "live" (no password). sudo works without a password.
+ * This is a live system: changes are lost when you power off.
+ * The pear button at the top left opens the app menu. The glass dock at the bottom is your
+   taskbar: pinned apps plus every window that is open. The top bar has network, sound, power and the clock.
+ * Ethernet: plug in a cable and it connects automatically (DHCP).
+   Wi-Fi and VPN: click the network icon at the top right of the screen.
+ * Glass effects: PearyOS picks the best mode for your machine automatically.
+   Frosted blur needs OpenGL (a real GPU, or a VM that provides it).
+   Without it you still get translucent glass, rounded windows and shadows, just no blur.
+   Force a mode:   mkdir -p ~/.config/pearyos && echo full > ~/.config/pearyos/glass-mode   (full | soft | lite | off), then log out and in.
+ * Problems with network or boot? Open a terminal and run:  pearyos-diag
+ * Install more software:  sudo apt update && sudo apt install <package>
+
+PearyOS is built from Ubuntu 24.04 (noble) packages with the Xfce desktop.
+It is an independent hobby project and is not affiliated with or endorsed by Canonical, Apple or the Xfce project.

@@ -1,0 +1,4 @@
+#!/bin/bash
+# The PearyOS dock (Plank) is the taskbar: pinned apps plus every running window, centered at the bottom.
+sleep 1.5   # let the compositor and the top bar come up first so the dock gets a glass (transparent) window
+exec plank

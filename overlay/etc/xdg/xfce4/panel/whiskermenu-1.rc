@@ -1,0 +1,10 @@
+favorites=thunar.desktop,org.gnome.Epiphany.desktop,xfce4-terminal.desktop,org.xfce.mousepad.desktop,xfce-settings-manager.desktop,gparted.desktop
+button-icon=pearyos-logo
+show-button-title=false
+show-button-icon=true
+button-single-row=true
+launcher-show-description=true
+launcher-show-tooltip=true
+menu-width=520
+menu-height=620
+menu-opacity=82

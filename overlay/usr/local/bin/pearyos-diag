@@ -1,0 +1,48 @@
+#!/bin/bash
+# PearyOS diagnostics: boot mode, network adapters and drivers, link/IP state, desktop session, glass effects.
+echo "=== PearyOS diagnostics ($(date -Is)) ==="
+echo "Kernel     : $(uname -r)"
+if [ -d /sys/firmware/efi ]; then echo "Boot mode  : UEFI"; else echo "Boot mode  : legacy BIOS"; fi
+if command -v mokutil >/dev/null 2>&1; then echo "SecureBoot : $(mokutil --sb-state 2>&1 | head -1)"; fi
+echo "Virtualiser: $(systemd-detect-virt 2>/dev/null || echo none)"
+echo
+echo "--- Network adapters ---"
+for d in /sys/class/net/*; do
+  n=$(basename "$d")
+  [ "$n" = lo ] && continue
+  drv=$(basename "$(readlink -f "$d/device/driver" 2>/dev/null)" 2>/dev/null)
+  echo "$n  driver=${drv:-?}  state=$(cat "$d/operstate" 2>/dev/null)  mac=$(cat "$d/address" 2>/dev/null)"
+done
+echo
+echo "--- NetworkManager ---"
+nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status 2>&1
+echo
+echo "--- Addresses ---"
+ip -br addr
+echo
+echo "--- Routes ---"
+ip route
+gw=$(ip route | awk '/^default/{print $3; exit}')
+if [ -n "$gw" ]; then
+  echo
+  echo "--- Ping gateway $gw ---"
+  ping -c 2 -W 2 "$gw" 2>&1 | tail -3
+fi
+echo
+echo "--- DNS ---"
+resolvectl status 2>/dev/null | grep -E 'Current DNS Server|DNS Servers' | sort -u | head -2
+ans=$(timeout 6 getent hosts archive.ubuntu.com | head -1)
+echo "lookup archive.ubuntu.com: ${ans:-no answer (no internet or DNS blocked)}"
+echo
+echo "--- Display / session ---"
+echo "lightdm    : $(systemctl is-active lightdm 2>&1)"
+for p in Xorg xfce4-session xfwm4 xfce4-panel xfdesktop plank picom nm-applet; do
+  printf '%-11s: %s\n' "$p" "$(pgrep -x "$p" >/dev/null && echo running || echo not-running)"
+done
+printf '%-11s: %s\n' "polkit-agent" "$(pgrep -f polkit-gnome-authentication-agent >/dev/null && echo running || echo not-running)"
+echo
+echo "--- Glass effects ---"
+state=$(ls /run/user/*/pearyos-glass-mode 2>/dev/null | head -1)
+echo "glass mode : $( [ -n "$state" ] && cat "$state" || echo unknown )   (full = GPU blur, soft = software-GL blur, lite = no blur, off = no compositor)"
+log=$(ls /run/user/*/pearyos-glass.log 2>/dev/null | head -1)
+[ -n "$log" ] && { echo "glass log  :"; grep -v "ignoring invalid extension event" "$log" | tail -n 4 | sed 's/^/  /'; }

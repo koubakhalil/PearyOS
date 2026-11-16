@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=PearyOS Glass
+Exec=/usr/local/bin/pearyos-glass
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=PearyOS Dock
+Exec=/usr/local/bin/pearyos-dock
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

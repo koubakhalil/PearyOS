@@ -1,0 +1,7 @@
+// PearyOS live session: the passwordless "live" user may perform administrative
+// actions (GParted, network settings, mounting disks) without a password prompt.
+polkit.addRule(function(action, subject) {
+    if (subject.user == "live" && subject.local && subject.active) {
+        return polkit.Result.YES;
+    }
+});

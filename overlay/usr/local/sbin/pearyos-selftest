@@ -1,0 +1,21 @@
+#!/bin/bash
+# Boot self-test hook. Inert unless a VM host injects the "pearyos.selftest" credential
+# (QEMU: -smbios type=11,value=io.systemd.credential:pearyos.selftest=1).
+# Waits for the desktop to come up, then prints pearyos-diag to the first serial port.
+exec >/dev/ttyS0 2>&1
+echo "=== PEARYOS SELFTEST BEGIN ==="
+for i in $(seq 1 240); do
+  pgrep -x plank >/dev/null && pgrep -x xfce4-panel >/dev/null && break
+  sleep 5
+done
+for i in $(seq 1 30); do
+  ip route | grep -q '^default' && break
+  sleep 2
+done
+sleep 8
+/usr/local/bin/pearyos-diag
+echo
+echo "--- Live user ---"
+id live
+if runuser -u live -- sudo -n true 2>/dev/null; then echo "sudo (passwordless): OK"; else echo "sudo (passwordless): FAILED"; fi
+echo "=== PEARYOS SELFTEST END ==="

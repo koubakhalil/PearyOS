@@ -1,0 +1,13 @@
+[Configuration]
+FontUseSystem=FALSE
+FontName=Fira Code 11
+ColorForeground=#eef2ff
+ColorBackground=#0e1438
+ColorCursor=#b9f35a
+ColorPalette=#1b2038;#ff6b8b;#8ef28c;#ffe27a;#6fb2ff;#d49bff;#6fe6e3;#e6eaff;#3a4268;#ff8fa8;#aaf9a8;#fff0a0;#93c7ff;#e5bdff;#9ff6f4;#ffffff
+BackgroundMode=TERMINAL_BACKGROUND_TRANSPARENT
+BackgroundDarkness=0.45
+MiscDefaultGeometry=96x28
+MiscCursorBlinks=TRUE
+MiscMenubarDefault=FALSE
+ScrollingUnlimited=TRUE

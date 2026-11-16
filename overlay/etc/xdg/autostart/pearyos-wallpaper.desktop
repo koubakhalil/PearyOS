@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=PearyOS Wallpaper
+Exec=/usr/local/bin/pearyos-wallpaper
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
